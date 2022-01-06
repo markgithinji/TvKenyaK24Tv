@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".DisclaimerActivity">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="45dp"
+        android:layout_height="57dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/k24tvlogo" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:gravity="center_horizontal"
+        android:text="K24 Tv App:" />
+
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal" />
+
+    <TextView
+        android:id="@+id/tvDisclaimer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginRight="40dp"
+        android:fontFamily="sans-serif-smallcaps"
+        android:text='"This app (Tv Kenya) is NOT endorsed, produced by or affiliated with any of the featured Kenyan Television Stations. \n\n" +                 "All trademarks and copyrights of the content are properties of their respective owners.\n\n" +                 "Please do support the featured tv stations by downloading, installing and using their respective official applications.\n\n" +                 "Should you be the owner or an authorized legal representative of the owner of any of the content in the app and not happy about it, \n\n" +                 "please do inform us by sending us an email smoothradioapp@gmail.com and we will gladly remove the content which you are not happy with.     '
+        android:textSize="12sp" />
+
+</LinearLayout>

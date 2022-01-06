@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "213635212382",
+    "project_id": "k24-tv-59491",
+    "storage_bucket": "k24-tv-59491.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:213635212382:android:c40e02611f16a826b800cf",
+        "android_client_info": {
+          "package_name": "com.kenyantvlive.k24tv"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "213635212382-tba0k0oqf9n0lju3b4sh6aao4lr3a4je.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA8nemxDTnQkfX0ZO3RxIRvYQiTU4RXuw0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "213635212382-tba0k0oqf9n0lju3b4sh6aao4lr3a4je.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
