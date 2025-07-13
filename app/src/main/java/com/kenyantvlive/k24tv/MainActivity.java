@@ -25,6 +25,11 @@ import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
+import com.google.android.ump.ConsentDebugSettings;
+import com.google.android.ump.ConsentForm;
+import com.google.android.ump.ConsentInformation;
+import com.google.android.ump.ConsentRequestParameters;
+import com.google.android.ump.UserMessagingPlatform;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -45,6 +50,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -72,15 +78,20 @@ public class MainActivity extends AppCompatActivity {
     ImageView ivDisclaimer;
     AdView bannerAd;
 
+    public static boolean isShowingAds;
+
+    public InterstitialAd interstitialAd;
+    //Consent form
+    private ConsentInformation consentInformation;
+    // Use an atomic boolean to initialize the Google Mobile Ads SDK and load ads once.
+    private final AtomicBoolean isMobileAdsInitializeCalled = new AtomicBoolean(false);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Application.mainActivity=MainActivity.this;
-        MobileAds.initialize(this);
-        loadAd();
-
+        showConsentForm();
 
         //SharedPrefs
         sharedPreferences= getSharedPreferences("SharedPref", Context.MODE_PRIVATE);
@@ -195,19 +206,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
                 super.onAdLoaded(interstitialAd);
-                Application.interstitialAd=interstitialAd;
-                Application.interstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
+                MainActivity.this.interstitialAd=interstitialAd;
+                MainActivity.this.interstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
                     @Override
                     public void onAdShowedFullScreenContent() {
                         super.onAdShowedFullScreenContent();
-                        Application.isShowingAds=true;
-                        Application.interstitialAd=null;
+                        isShowingAds=true;
+                        MainActivity.this.interstitialAd=null;
                     }
 
                     @Override
                     public void onAdDismissedFullScreenContent() {
                         super.onAdDismissedFullScreenContent();
-                        Application.isShowingAds=false;
+                        isShowingAds=false;
                         prefsEditor.putString("adLastShownTime",new SimpleDateFormat("yyyy.MM.dd hh:mm:ss aa", Locale.getDefault()).format(Calendar.getInstance().getTime()));
                         prefsEditor.commit();
 
@@ -218,8 +229,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                 super.onAdFailedToLoad(loadAdError);
-                Application.interstitialAd=null;
-                Application.isShowingAds=false;
+                MainActivity.this.interstitialAd=null;
+                MainActivity.this.isShowingAds=false;
             }
         });
     }
@@ -227,17 +238,17 @@ public class MainActivity extends AppCompatActivity {
     {
         loadAd();
         Boolean show = shouldShowAd();
-        if (Application.interstitialAd != null) {
+        if (MainActivity.this.interstitialAd != null) {
             if(show)
             {
-                Application.interstitialAd.show(MainActivity.this);
-                Application.isShowingAds=true;
+                MainActivity.this.interstitialAd.show(MainActivity.this);
+                isShowingAds=true;
             }
         }
         else
         {
-            Application.interstitialAd=null;
-            Application.isShowingAds=false;
+            MainActivity.this.interstitialAd=null;
+            MainActivity.this.isShowingAds=false;
         }
     }
 
@@ -527,6 +538,68 @@ public class MainActivity extends AppCompatActivity {
         }).start();
 
     }
+
+    void showConsentForm() {
+
+        ConsentRequestParameters params = new ConsentRequestParameters
+                .Builder()
+                .build();
+
+        consentInformation = UserMessagingPlatform.getConsentInformation(this);
+        consentInformation.requestConsentInfoUpdate(
+                this,
+                params,
+                (ConsentInformation.OnConsentInfoUpdateSuccessListener) () -> {
+                    UserMessagingPlatform.loadAndShowConsentFormIfRequired(
+                            this,
+                            (ConsentForm.OnConsentFormDismissedListener) loadAndShowError -> {
+                                if (loadAndShowError != null) {
+                                    // Consent gathering failed.
+
+                                }
+
+                                // Consent has been gathered.
+                                if (consentInformation.canRequestAds()) {
+                                    initializeMobileAdsSdk();
+                                }
+                            }
+                    );
+                },
+                (ConsentInformation.OnConsentInfoUpdateFailureListener) requestConsentError -> {
+                    // Consent gathering failed.
+                });
+
+        if (consentInformation.canRequestAds()) {
+            initializeMobileAdsSdk();
+        }
+    }
+
+    private void initializeMobileAdsSdk() {
+        if (isMobileAdsInitializeCalled.getAndSet(true)) {
+            return;
+        }
+
+        MobileAds.initialize(this);
+        //interstitial Ad
+
+        AdRequest interstitialAdRequest = new AdRequest.Builder().build();
+        InterstitialAd.load(this, "ca-app-pub-9799428944156340/7449378550", interstitialAdRequest, new InterstitialAdLoadCallback() {
+
+            @Override
+            public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                super.onAdLoaded(interstitialAd);
+                MainActivity.this.interstitialAd=interstitialAd;
+            }
+
+            @Override
+            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                super.onAdFailedToLoad(loadAdError);
+                MainActivity.this.interstitialAd=null;
+            }
+        });
+    }
+
+
 
     @Override
     protected void onDestroy() {

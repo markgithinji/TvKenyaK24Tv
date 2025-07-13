@@ -69,7 +69,7 @@ public class WebViewActivity extends AppCompatActivity {
         webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
         webView.getSettings().setLoadsImagesAutomatically(true);
         webView.setWebChromeClient(webChromeClient);
-        webView.getSettings().setAppCacheEnabled(true);
+        //webView.getSettings().setAppCacheEnabled(true);
         webView.setWebViewClient(webViewClient);
         webView.setLayerType(View.LAYER_TYPE_HARDWARE,null);
         webView.loadUrl(link);

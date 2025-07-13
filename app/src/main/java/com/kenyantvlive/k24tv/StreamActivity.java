@@ -1,5 +1,9 @@
 package com.kenyantvlive.k24tv;
 
+import static androidx.core.content.ContextCompat.getSystemService;
+import static androidx.core.content.ContextCompat.registerReceiver;
+
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -16,7 +20,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.transition.TransitionManager;
 
 import com.google.android.exoplayer2.ExoPlayer;
@@ -28,7 +31,7 @@ import com.google.android.exoplayer2.ui.StyledPlayerView;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
-public class StreamActivity extends AppCompatActivity {
+public class StreamActivity extends Activity {
     //UI
     StyledPlayerView playerView;
     ExoPlayer player;
@@ -64,8 +67,8 @@ public class StreamActivity extends AppCompatActivity {
         mAdView= findViewById(R.id.adView);
         playerView = findViewById(R.id.player_view);
         tvStationName= findViewById(R.id.tvStationName);
-        ivFullscreen =playerView.findViewById(R.id.exo_fullscreen_icon);
-        ivPlayPause= playerView.findViewById(R.id.exo_pause);
+        ivFullscreen = playerView.findViewById(R.id.exo_fullscreen_icon);
+//        ivPlayPause = playerView.findViewById(R.id.pau);
 
 
         link= getIntent().getStringExtra("link");
@@ -92,7 +95,7 @@ public class StreamActivity extends AppCompatActivity {
         registerReceiver(playReceiver,playFilter);//PlayFromAd
         //Audio Focus
         playPauseIntent.setAction(playPauseAction);
-        audioManager= (AudioManager) getSystemService(AUDIO_SERVICE);
+        audioManager= (AudioManager) getSystemService();
         onAudioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
             @Override
             public void onAudioFocusChange(int i) {
@@ -123,7 +126,7 @@ public class StreamActivity extends AppCompatActivity {
         playerView.setPlayer(player);
         playerView.setKeepScreenOn(true);
         player.addListener(eventListener);
-        if(!Application.isShowingAds)
+        if(MainActivity.isShowingAds)
         {
             player.setPlayWhenReady(true);
             isPlaying=true;
@@ -158,6 +161,7 @@ public class StreamActivity extends AppCompatActivity {
             {
                 playerView.getLayoutParams().height = playerHeight;//
                 playerView.requestLayout();//restore height portrait when exit full screen with error
+                layoutTransitionAnimation();
 
                 showStatusNavigation();
                 ivFullscreen.setBackgroundResource(R.drawable.exo_controls_fullscreen_enter);
@@ -171,6 +175,7 @@ public class StreamActivity extends AppCompatActivity {
 
                 playerView.getLayoutParams().height = LinearLayout.LayoutParams.WRAP_CONTENT;
                 playerView.requestLayout();// wrap video content to fill when in fullscreen.
+                layoutTransitionAnimation();
 
                 removeStatusNavigation();
                 ivFullscreen.setBackgroundResource(R.drawable.exo_controls_fullscreen_exit);
@@ -178,7 +183,6 @@ public class StreamActivity extends AppCompatActivity {
                 playerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
                 isFullscreen=true;
             }
-            layoutTransitionAnimation();
         }
     }
     class PLayPauseReceiver extends BroadcastReceiver
