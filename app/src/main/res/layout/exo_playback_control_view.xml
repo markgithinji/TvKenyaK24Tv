@@ -26,8 +26,10 @@
             style="@style/ExoStyledControls.Button.Center.RewWithAmount"
             android:layout_width="36dp"
             android:layout_height="36dp" />
-        <ImageButton android:id="@id/exo_pause"
-           android:layout_width="wrap_content"
+
+        <ImageButton
+            android:id="@+id/exo_pause"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
         <ImageButton
